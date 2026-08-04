@@ -1,0 +1,35 @@
+:root {
+  /* Backgrounds */
+  --color-bg-app: #222528;
+  --color-bg-surface: #2C2F33;
+  --color-bg-surface-alt: #393D41;
+
+  /* Text */
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: #94979A;
+
+  /* Semantic / accent */
+  --color-danger: #DA584B;       /* "+" button, Create/Delete actions, overdue date badge */
+  --color-danger-soft: #EBA59E;  /* disabled state of Create/Delete button */
+  --color-link: #4098FF;         /* "Go back" / "Delete" text links in the delete-confirm popover */
+
+  /* Subtle (10% opacity) backgrounds for badges/hover */
+  --color-danger-10: #DA584B1A;
+  --color-success-10: #70B2521A;
+  --color-warning-10: #E5B4541A;
+  --color-muted-10: #94979A1A;
+
+  /* Status colors */
+  --color-status-backlog: #94979A;
+  --color-status-todo: #94979A;
+  --color-status-in-progress: #E5B454;
+  --color-status-done: #70B252;
+  --color-status-cancelled: #DA584B;
+
+  /* Tag colors (TaskTag enum) */
+  --color-tag-ios: #70B252;
+  --color-tag-android: #E5B454;
+  --color-tag-react: #4098FF;
+  --color-tag-node: #9B7FE0;
+  --color-tag-rails: #4FB3A6;
+}
