@@ -1,14 +1,13 @@
 import './App.css'
-import { Sidebar } from './components/layout/Sidebar/Sidebar'
+import { PageWrapper } from './components/layout/PageWrapper/PageWrapper'
 
 function App() {
 
   return (
     <>
-      <Sidebar />
-      <main>
-        <h1>Welcome to the Task Management App</h1>
-      </main>
+      <PageWrapper>
+        <div>Page content</div>
+      </PageWrapper>
     </>
   )
 }
