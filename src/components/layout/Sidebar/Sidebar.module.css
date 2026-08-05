@@ -1,0 +1,38 @@
+.sidebar {
+  background-color: var(--color-bg-surface);
+  height: 100%;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  color: var(--color-text-muted);
+  border-left: 4px solid transparent;
+}
+
+.navItemActive {
+  color: var(--color-text-primary);
+  border-left-color: var(--color-danger);
+}
+
+.logo {
+  box-sizing: border-box;
+  width: 40px;
+  padding: var(--spacing-16);
+  object-fit: contain;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}

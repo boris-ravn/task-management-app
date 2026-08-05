@@ -1,10 +1,14 @@
 import './App.css'
+import { Sidebar } from './components/layout/Sidebar/Sidebar'
 
 function App() {
 
   return (
     <>
-      <h1>Task Management App</h1>
+      <Sidebar />
+      <main>
+        <h1>Welcome to the Task Management App</h1>
+      </main>
     </>
   )
 }
