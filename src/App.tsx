@@ -1,14 +1,12 @@
 import './App.css'
 import { PageWrapper } from './components/layout/PageWrapper/PageWrapper'
+import { AppRoutes } from './routes'
 
 function App() {
-
   return (
-    <>
-      <PageWrapper>
-        <div>Page content</div>
-      </PageWrapper>
-    </>
+    <PageWrapper>
+      <AppRoutes />
+    </PageWrapper>
   )
 }
 
