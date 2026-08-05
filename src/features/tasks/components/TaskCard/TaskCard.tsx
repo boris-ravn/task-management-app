@@ -50,7 +50,7 @@ interface TaskCardProps {
 
 export function TaskCard({ task }: TaskCardProps) {
   const overdue = isOverdue(task.dueDate)
-  
+
   return (
     <div className={styles.card}>
 
@@ -63,7 +63,7 @@ export function TaskCard({ task }: TaskCardProps) {
 
       <div className={styles.meta}>
         <span>{POINT_LABELS[task.pointEstimate]} Points</span>
-        <div className={`${styles.dueDate} ${overdue ? styles.dueDateOverdue : ''}`}>
+        <div data-testid="due-date" className={`${styles.dueDate} ${overdue ? styles.dueDateOverdue : ''}`}>
           <ClockIcon />
           <span>{formatDueDate(task.dueDate)}</span>
         </div>
