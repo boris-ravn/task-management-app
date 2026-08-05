@@ -1,16 +1,17 @@
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: var(--spacing-16) var(--spacing-24);
+  background-color: var(--color-bg-surface);
+  margin: var(--spacing-16) var(--spacing-16) 0;
+  border-radius: 16px;
 }
 
 .search {
   display: flex;
   align-items: center;
   gap: var(--spacing-8);
-  background-color: var(--color-bg-surface-alt);
-  padding: var(--spacing-8);
+  flex: 1;
 }
 
 .icon {
@@ -22,6 +23,7 @@
   border: none;
   background: none;
   color: var(--color-text-primary);
+  outline: none;
 }
 
 .searchInput::placeholder {
