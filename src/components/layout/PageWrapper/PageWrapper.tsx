@@ -14,7 +14,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
 
       <div className={styles.content}>
         <Header />
-        <main>
+        <main className={styles.main}>
           {children}
         </main>
       </div>
