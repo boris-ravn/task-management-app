@@ -1,0 +1,65 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--color-bg-surface);
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 600px;
+  margin: auto;
+  position: relative;
+  z-index: 1001;
+}
+
+.titleInput {
+  width: 100%;
+  font-size: 1.5rem;
+  color: var(--color-text-primary);
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.pickers {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.pickerButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg-surface-alt);
+  border-radius: 4px;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.createButton {
+  background: var(--color-danger);
+  color: white;
+  border-radius: 4px;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
