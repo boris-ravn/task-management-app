@@ -53,7 +53,7 @@ function DashboardContent() {
           />
         ))}
       </div>
-      {state.isModalOpen && <TaskModal />}
+      {state.modal.mode !== 'closed' && <TaskModal />}
     </div>
   )
 }
