@@ -21,6 +21,14 @@ vi.mock('../../hooks/useUsers', () => ({
   }),
 }));
 
+vi.mock('../../hooks/useUpdateTask', () => ({
+  useUpdateTask: () => ({
+    updateTask: vi.fn(),
+    loading: false,
+    error: undefined,
+  }),
+}));
+
 function OpenAndRender() {
   const { dispatch, state } = useTasksUI();
 
@@ -28,7 +36,7 @@ function OpenAndRender() {
     dispatch({ type: 'OPEN_MODAL' });
   }, [dispatch]);
 
-  return state.isModalOpen ? <TaskModal /> : null;
+  return state.modal.mode !== 'closed' ? <TaskModal /> : null;
 }
 
 function renderModal() { 

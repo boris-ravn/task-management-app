@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTasksUI } from '../../context/TasksUIContext';
 import { useCreateTask } from '../../hooks/useCreateTask';
+import { useUpdateTask } from '../../hooks/useUpdateTask';
 import { useUsers } from '../../hooks/useUsers';
 import { PointEstimate, Status, TaskTag } from '../../types';
 import { EstimateIcon } from '../../../../components/ui/icons/EstimateIcon';
@@ -33,10 +34,28 @@ const TAG_OPTIONS = Object.values(TaskTag);
 const STATUS_OPTIONS = Object.values(Status);
 
 export function TaskModal() {
-  const { dispatch } = useTasksUI();
-  const { createTask, loading } = useCreateTask();
+  const { state, dispatch } = useTasksUI();
+  const { createTask, loading: createLoading } = useCreateTask();
+  const { updateTask, loading: updateLoading } = useUpdateTask();
   const { users } = useUsers();
-  const [form, setForm] = useState(initialFormState);
+
+  const editingTask = state.modal.mode === 'edit' ? state.modal.task : undefined;
+  const isEditMode = editingTask !== undefined;
+
+  const [form, setForm] = useState<FormState>(() => {
+    if (editingTask) {
+      return {
+        name: editingTask.name,
+        status: editingTask.status,
+        pointEstimate: editingTask.pointEstimate,
+        dueDate: editingTask.dueDate.split('T')[0],
+        tags: [...editingTask.tags],
+        assigneeId: editingTask.assignee?.id || '',
+      };
+    }
+    return initialFormState;
+  });
+
   const [openPicker, setOpenPicker] = useState<string | null>(null);
 
   const togglePicker = (name: string) => {
@@ -50,6 +69,24 @@ export function TaskModal() {
     form.tags.length > 0;
 
   const handleSubmit = async () => {
+    if (isEditMode) {
+      await updateTask({
+        variables: {
+          input: {
+            id: editingTask!.id,
+            name: form.name,
+            status: form.status,
+            pointEstimate: form.pointEstimate,
+            dueDate: form.dueDate,
+            tags: form.tags,
+            assigneeId: form.assigneeId || undefined,
+          },
+        },
+      });
+      dispatch({ type: 'CLOSE_MODAL' });
+      return;
+    }
+
     await createTask({
       variables: {
         input: {
@@ -69,14 +106,14 @@ export function TaskModal() {
 
   return (
     <div className={styles.overlay} onClick={() => setOpenPicker(null)}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => { e.stopPropagation(); setOpenPicker(null); }}>
         <input
           placeholder="Task Title"
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
           className={styles.titleInput}
         />
-        <div className={styles.pickers}>
+        <div className={styles.pickers} onClick={(e) => e.stopPropagation()}>
 
           <div className={styles.pickerWrapper}>
             <button type="button" className={styles.pickerButton} onClick={() => togglePicker('status')}>
@@ -191,10 +228,10 @@ export function TaskModal() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={!isFormValid || loading}
+            disabled={!isFormValid || createLoading || updateLoading}
             className={styles.createButton}
           >
-            Create
+            {isEditMode ? 'Update' : 'Create'}
           </button>
         </div>
       </div>
