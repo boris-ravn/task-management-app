@@ -24,6 +24,14 @@ vi.mock('../features/tasks/hooks/useUsers', () => ({
   }),
 }));
 
+vi.mock('../features/tasks/hooks/useUpdateTask', () => ({
+  useUpdateTask: () => ({
+    updateTask: vi.fn(),
+    loading: false,
+    error: undefined,
+  }),
+}));
+
 describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
