@@ -3,6 +3,11 @@ import { useTasksUI } from '../../context/TasksUIContext';
 import { useCreateTask } from '../../hooks/useCreateTask';
 import { useUsers } from '../../hooks/useUsers';
 import { PointEstimate, Status, TaskTag } from '../../types';
+import { EstimateIcon } from '../../../../components/ui/icons/EstimateIcon';
+import { AssigneeIcon } from '../../../../components/ui/icons/AssigneeIcon';
+import { LabelIcon } from '../../../../components/ui/icons/LabelIcon';
+import { DueDateIcon } from '../../../../components/ui/icons/DueDateIcon';
+import { ListIcon } from '../../../../components/ui/icons/ListIcon';
 import styles from './TaskModal.module.css';
 
 export interface FormState {
@@ -32,6 +37,11 @@ export function TaskModal() {
   const { createTask, loading } = useCreateTask();
   const { users } = useUsers();
   const [form, setForm] = useState(initialFormState);
+  const [openPicker, setOpenPicker] = useState<string | null>(null);
+
+  const togglePicker = (name: string) => {
+    setOpenPicker((prev) => (prev === name ? null : name));
+  };
 
   const isFormValid =
     form.name.trim() !== '' &&
@@ -55,9 +65,11 @@ export function TaskModal() {
     dispatch({ type: 'CLOSE_MODAL' });
   };
 
+  const selectedAssignee = users.find((u) => u.id === form.assigneeId);
+
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={styles.overlay} onClick={() => setOpenPicker(null)}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <input
           placeholder="Task Title"
           value={form.name}
@@ -65,80 +77,119 @@ export function TaskModal() {
           className={styles.titleInput}
         />
         <div className={styles.pickers}>
-          <label>
-            Status
-            <select
-              value={form.status}
-              onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value as Status }))}
-            >
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Estimate
-            <select
-              value={form.pointEstimate}
-              onChange={(e) => setForm((prev) => ({ ...prev, pointEstimate: e.target.value as PointEstimate }))}
-            >
-              <option value="">Select Estimate</option>
-              {POINT_ESTIMATE_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Assignee
-            <select
-              value={form.assigneeId}
-              onChange={(e) => setForm((prev) => ({ ...prev, assigneeId: e.target.value }))}
-            >
-              <option value="">Select Assignee</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.fullName}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div>
-            <span>Label</span>
-            <div className={styles.tags}>
-              {TAG_OPTIONS.map((tag) => (
-                <label key={tag}>
-                  <input
-                    type="checkbox"
-                    checked={form.tags.includes(tag)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setForm((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
-                      } else {
-                        setForm((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
-                      }
-                    }}
-                  />
-                  {tag}
-                </label>
-              ))}
-            </div>
+
+          <div className={styles.pickerWrapper}>
+            <button type="button" className={styles.pickerButton} onClick={() => togglePicker('status')}>
+              <ListIcon />
+              <span>{form.status}</span>
+            </button>
+            {openPicker === 'status' && (
+              <ul className={styles.dropdown}>
+                {STATUS_OPTIONS.map((option) => (
+                  <li
+                    key={option}
+                    className={`${styles.dropdownItem} ${form.status === option ? styles.dropdownItemActive : ''}`}
+                    onClick={() => { setForm((prev) => ({ ...prev, status: option })); setOpenPicker(null); }}
+                  >
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <label>
-            Due Date
-            <input
-              type="date"
-              value={form.dueDate}
-              onChange={(e) => setForm((prev) => ({ ...prev, dueDate: e.target.value }))}
-            />
-          </label>
+
+          <div className={styles.pickerWrapper}>
+            <button type="button" className={styles.pickerButton} onClick={() => togglePicker('estimate')}>
+              <EstimateIcon />
+              <span>{form.pointEstimate || 'Estimate'}</span>
+            </button>
+            {openPicker === 'estimate' && (
+              <ul className={styles.dropdown}>
+                {POINT_ESTIMATE_OPTIONS.map((option) => (
+                  <li
+                    key={option}
+                    className={`${styles.dropdownItem} ${form.pointEstimate === option ? styles.dropdownItemActive : ''}`}
+                    onClick={() => { setForm((prev) => ({ ...prev, pointEstimate: option })); setOpenPicker(null); }}
+                  >
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className={styles.pickerWrapper}>
+            <button type="button" className={styles.pickerButton} onClick={() => togglePicker('assignee')}>
+              <AssigneeIcon />
+              <span>{selectedAssignee?.fullName || 'Assignee'}</span>
+            </button>
+            {openPicker === 'assignee' && (
+              <ul className={styles.dropdown}>
+                {users.map((user) => (
+                  <li
+                    key={user.id}
+                    className={`${styles.dropdownItem} ${form.assigneeId === user.id ? styles.dropdownItemActive : ''}`}
+                    onClick={() => { setForm((prev) => ({ ...prev, assigneeId: user.id })); setOpenPicker(null); }}
+                  >
+                    {user.fullName}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className={styles.pickerWrapper}>
+            <button type="button" className={styles.pickerButton} onClick={() => togglePicker('label')}>
+              <LabelIcon />
+              <span>{form.tags.length > 0 ? form.tags.join(', ') : 'Label'}</span>
+            </button>
+            {openPicker === 'label' && (
+              <ul className={styles.dropdown}>
+                {TAG_OPTIONS.map((tag) => (
+                  <li key={tag} className={styles.dropdownItem}>
+                    <label className={styles.checkboxItem}>
+                      <input
+                        type="checkbox"
+                        checked={form.tags.includes(tag)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setForm((prev) => ({ ...prev, tags: [...prev.tags, tag] }));
+                          } else {
+                            setForm((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
+                          }
+                        }}
+                      />
+                      {tag}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className={styles.pickerWrapper}>
+            <button type="button" className={styles.pickerButton} onClick={() => togglePicker('dueDate')}>
+              <DueDateIcon />
+              <span>{form.dueDate || 'Due Date'}</span>
+            </button>
+            {openPicker === 'dueDate' && (
+              <div className={styles.dropdown}>
+                <input
+                  type="date"
+                  value={form.dueDate}
+                  className={styles.dateInput}
+                  autoFocus
+                  onChange={(e) => { setForm((prev) => ({ ...prev, dueDate: e.target.value })); setOpenPicker(null); }}
+                />
+              </div>
+            )}
+          </div>
+
         </div>
         <div className={styles.actions}>
-          <button onClick={() => dispatch({ type: 'CLOSE_MODAL' })}>Cancel</button>
+          <button type="button" onClick={() => dispatch({ type: 'CLOSE_MODAL' })}>Cancel</button>
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || loading}
             className={styles.createButton}
@@ -148,5 +199,5 @@ export function TaskModal() {
         </div>
       </div>
     </div>
-  )
+  );
 }

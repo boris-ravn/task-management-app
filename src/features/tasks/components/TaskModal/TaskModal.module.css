@@ -3,14 +3,17 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal {
   background: var(--color-bg-surface);
   border-radius: 8px;
   padding: 24px;
-  max-width: 600px;
-  margin: auto;
+  width: 100%;
+  max-width: 680px;
   position: relative;
   z-index: 1001;
 }
@@ -26,9 +29,13 @@
 
 .pickers {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   flex-wrap: wrap;
   margin-top: 16px;
+}
+
+.pickerWrapper {
+  position: relative;
 }
 
 .pickerButton {
@@ -40,6 +47,59 @@
   padding: 8px 12px;
   border: none;
   cursor: pointer;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.pickerButton:hover {
+  opacity: 0.8;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--color-bg-surface-alt);
+  border-radius: 4px;
+  z-index: 10;
+  min-width: 160px;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.dropdownItem:hover {
+  background: var(--color-bg-surface);
+}
+
+.dropdownItemActive {
+  color: var(--color-danger);
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.dateInput {
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  width: 100%;
 }
 
 .actions {
@@ -58,8 +118,7 @@
   cursor: pointer;
 }
 
-.tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+.createButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

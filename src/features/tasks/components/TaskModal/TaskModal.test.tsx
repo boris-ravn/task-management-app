@@ -53,10 +53,10 @@ describe('TaskModal', () => {
   it('renders all picker labels', () => {
     renderModal();
     expect(screen.getByText('Estimate')).toBeInTheDocument();
-    expect(screen.getByText('Status')).toBeInTheDocument();
+    expect(screen.getByText('BACKLOG')).toBeInTheDocument();
     expect(screen.getByText('Assignee')).toBeInTheDocument();
     expect(screen.getByText('Label')).toBeInTheDocument();
-    expect(screen.getByText('Due Date')).toBeInTheDocument();  
+    expect(screen.getByText('Due Date')).toBeInTheDocument();
   });
 
   it('Create button is disabled when no fields are filled', () => {

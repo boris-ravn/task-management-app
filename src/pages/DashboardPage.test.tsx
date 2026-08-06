@@ -5,7 +5,7 @@ import { DashboardPage } from './DashboardPage';
 import { useTasks } from '../features/tasks/hooks/useTasks';
 
 vi.mock('../features/tasks/hooks/useTasks', () => ({
-  useTasks: () => ({ tasks: [], loading: true, error: undefined }),
+  useTasks: vi.fn(() => ({ tasks: [], loading: true, error: undefined })),
 }));
 
 vi.mock('../features/tasks/hooks/useCreateTask', () => ({
