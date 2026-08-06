@@ -75,29 +75,35 @@ export function TaskCard({ task }: TaskCardProps) {
       </div>
 
       {showMenu && (
-        <div className={styles.menu}>
-          <button
-            className={styles.menuItem}
-            onClick={() => {
-              dispatch({ type: 'OPEN_MODAL_FOR_EDIT', task })
-              setShowMenu(false)
-            }}
-          >
-            <EditIcon />
-            Edit
-          </button>
+        <>
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 9 }}
+            onClick={() => setShowMenu(false)}
+          />
+          <div className={styles.menu}>
+            <button
+              className={styles.menuItem}
+              onClick={() => {
+                dispatch({ type: 'OPEN_MODAL_FOR_EDIT', task })
+                setShowMenu(false)
+              }}
+            >
+              <EditIcon />
+              Edit
+            </button>
 
-          <button
-            className={styles.menuItem}
-            onClick={() => {
-              setShowDeleteConfirm(true)
-              setShowMenu(false)
-            }}
-          >
-            <DeleteIcon />
-            Delete
-          </button>
-        </div>
+            <button
+              className={styles.menuItem}
+              onClick={() => {
+                setShowDeleteConfirm(true)
+                setShowMenu(false)
+              }}
+            >
+              <DeleteIcon />
+              Delete
+            </button>
+          </div>
+        </>
       )}
 
       <div className={styles.meta}>

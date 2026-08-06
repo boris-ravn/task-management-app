@@ -106,14 +106,14 @@ export function TaskModal() {
 
   return (
     <div className={styles.overlay} onClick={() => setOpenPicker(null)}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modal} onClick={(e) => { e.stopPropagation(); setOpenPicker(null); }}>
         <input
           placeholder="Task Title"
           value={form.name}
           onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
           className={styles.titleInput}
         />
-        <div className={styles.pickers}>
+        <div className={styles.pickers} onClick={(e) => e.stopPropagation()}>
 
           <div className={styles.pickerWrapper}>
             <button type="button" className={styles.pickerButton} onClick={() => togglePicker('status')}>
