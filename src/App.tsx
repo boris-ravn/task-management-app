@@ -1,11 +1,12 @@
 import './App.css'
+import { PageWrapper } from './components/layout/PageWrapper/PageWrapper'
+import { AppRoutes } from './routes'
 
 function App() {
-
   return (
-    <>
-      <h1>Task Management App</h1>
-    </>
+    <PageWrapper>
+      <AppRoutes />
+    </PageWrapper>
   )
 }
 

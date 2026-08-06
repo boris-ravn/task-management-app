@@ -32,4 +32,11 @@
   --color-tag-react: #4098FF;
   --color-tag-node: #9B7FE0;
   --color-tag-rails: #4FB3A6;
+
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
 }

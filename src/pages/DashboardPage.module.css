@@ -1,0 +1,53 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewToggle {
+  display: flex;
+  gap: var(--spacing-8);
+}
+
+.viewButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: var(--spacing-8);
+  border-radius: 4px;
+  display: flex;
+}
+
+.viewButtonActive {
+  background-color: var(--color-bg-surface-alt);
+  color: var(--color-text-primary);
+}
+
+.addButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background-color: var(--color-danger);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.columns {
+  display: flex;
+  gap: var(--spacing-24);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-16);
+  flex: 1;
+}
