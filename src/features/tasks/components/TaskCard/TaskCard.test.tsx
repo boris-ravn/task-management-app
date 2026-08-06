@@ -2,7 +2,15 @@ import { render, screen } from '@testing-library/react'
 import { TaskCard } from './TaskCard'
 import { Status, TaskTag, PointEstimate } from '../../types'
 import type { Task } from '../../types'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('../../context/TasksUIContext', () => ({
+  useTasksUI: () => ({ dispatch: vi.fn() }),
+}))
+
+vi.mock('../../hooks/useDeleteTask', () => ({
+  useDeleteTask: () => ({ deleteTask: vi.fn(), loading: false, error: undefined }),
+}))
 
 const MOCK_TASK: Task = {
   id: '1',

@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import type { Task } from '../../types'
 import { TaskTag, PointEstimate } from '../../types'
 import { ClockIcon } from '../../../../components/ui/icons/ClockIcon'
 import { OptionsIcon } from '../../../../components/ui/icons/OptionsIcon'
+import { useTasksUI } from '../../context/TasksUIContext'
+import { useDeleteTask } from '../../hooks/useDeleteTask'
 import styles from './TaskCard.module.css'
 
 const POINT_LABELS: Record<PointEstimate, string> = {
@@ -51,15 +54,50 @@ interface TaskCardProps {
 export function TaskCard({ task }: TaskCardProps) {
   const overdue = isOverdue(task.dueDate)
 
+  const { dispatch } = useTasksUI()
+  const { deleteTask, loading: deleteLoading } = useDeleteTask()
+  const [showMenu, setShowMenu] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   return (
     <div className={styles.card}>
 
       <div className={styles.header}>
         <span className={styles.title}>{task.name}</span>
-        <button className={styles.optionsButton}>
+        <button
+          className={styles.optionsButton}
+          onClick={() => setShowMenu(prev => !prev)}
+        >
           <OptionsIcon />
         </button>
       </div>
+
+      {showMenu && (
+        <div className={styles.menu}>
+          <button
+            className={styles.menuItem}
+            onClick={() => {
+              dispatch({
+                type: 'OPEN_MODAL_FOR_EDIT',
+                task,
+              })
+              setShowMenu(false)
+            }}
+          >
+            Edit
+          </button>
+
+          <button
+            className={styles.menuItem}
+            onClick={() => {
+              setShowDeleteConfirm(true)
+              setShowMenu(false)
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      )}
 
       <div className={styles.meta}>
         <span>{POINT_LABELS[task.pointEstimate]} Points</span>
@@ -95,6 +133,38 @@ export function TaskCard({ task }: TaskCardProps) {
           <div className={styles.avatar} />
         )}
       </div>
+
+      {showDeleteConfirm && (
+        <div className={styles.deleteConfirm}>
+          <p>Are you sure you want to delete this task?</p>
+
+          <div className={styles.deleteActions}>
+            <button
+              className={styles.deleteButton}
+              disabled={deleteLoading}
+              onClick={async() => {
+                await deleteTask({
+                  variables: {
+                    input: {
+                      id: task.id,
+                    },
+                  },
+                })
+                setShowDeleteConfirm(false)
+              }}
+            >
+              Delete
+            </button>
+
+            <button
+              className={styles.goBackButton}
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   )

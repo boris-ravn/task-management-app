@@ -2,7 +2,15 @@ import { render, screen } from '@testing-library/react'
 import { TaskColumn } from './TaskColumn'
 import { Status, TaskTag, PointEstimate, UserType } from '../../types'
 import type { Task } from '../../types'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('../../context/TasksUIContext', () => ({
+  useTasksUI: () => ({ dispatch: vi.fn() }),
+}))
+
+vi.mock('../../hooks/useDeleteTask', () => ({
+  useDeleteTask: () => ({ deleteTask: vi.fn(), loading: false, error: undefined }),
+}))
 
 const MOCK_USER = {
   id: 'u1',

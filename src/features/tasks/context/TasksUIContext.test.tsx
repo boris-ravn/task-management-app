@@ -10,7 +10,7 @@ function wrapper({ children }: { children: ReactNode }) {
 describe('useTasksUI', () => {
   it('exposes initial state with isModalOpen: false', () => {
     const { result } = renderHook(() => useTasksUI(), { wrapper });
-    expect(result.current.state.isModalOpen).toBe(false);
+    expect(result.current.state.modal.mode).toBe('closed');
   });
 
   it('dispatching OPEN_MODAL sets isModalOpen to true', () => {
@@ -18,7 +18,7 @@ describe('useTasksUI', () => {
     act(() => {
       result.current.dispatch({ type: 'OPEN_MODAL' });
     });
-    expect(result.current.state.isModalOpen).toBe(true);
+    expect(result.current.state.modal.mode).toBe('create');
   });
 
   it('dispatching CLOSE_MODAL after OPEN_MODAL sets isModalOpen back to false', () => {
@@ -26,12 +26,12 @@ describe('useTasksUI', () => {
     act(() => {
       result.current.dispatch({ type: 'OPEN_MODAL' });
     });
-    expect(result.current.state.isModalOpen).toBe(true);
+    expect(result.current.state.modal.mode).toBe('create');
 
     act(() => {
       result.current.dispatch({ type: 'CLOSE_MODAL' });
     });
-    expect(result.current.state.isModalOpen).toBe(false);
+    expect(result.current.state.modal.mode).toBe('closed');
   });
 
   it('throws when used outside TasksUIProvider', () => {
