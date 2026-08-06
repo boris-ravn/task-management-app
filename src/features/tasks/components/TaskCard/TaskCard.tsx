@@ -3,6 +3,8 @@ import type { Task } from '../../types'
 import { TaskTag, PointEstimate } from '../../types'
 import { ClockIcon } from '../../../../components/ui/icons/ClockIcon'
 import { OptionsIcon } from '../../../../components/ui/icons/OptionsIcon'
+import { EditIcon } from '../../../../components/ui/icons/EditIcon'
+import { DeleteIcon } from '../../../../components/ui/icons/DeleteIcon'
 import { useTasksUI } from '../../context/TasksUIContext'
 import { useDeleteTask } from '../../hooks/useDeleteTask'
 import styles from './TaskCard.module.css'
@@ -77,13 +79,11 @@ export function TaskCard({ task }: TaskCardProps) {
           <button
             className={styles.menuItem}
             onClick={() => {
-              dispatch({
-                type: 'OPEN_MODAL_FOR_EDIT',
-                task,
-              })
+              dispatch({ type: 'OPEN_MODAL_FOR_EDIT', task })
               setShowMenu(false)
             }}
           >
+            <EditIcon />
             Edit
           </button>
 
@@ -94,6 +94,7 @@ export function TaskCard({ task }: TaskCardProps) {
               setShowMenu(false)
             }}
           >
+            <DeleteIcon />
             Delete
           </button>
         </div>
