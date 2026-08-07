@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Status } from '../features/tasks/types'
 import { TaskColumn } from '../features/tasks/components/TaskColumn/TaskColumn'
 import { TaskModal } from '../features/tasks/components/TaskModal/TaskModal'
@@ -9,32 +10,51 @@ import { PlusIcon } from '../components/ui/icons/PlusIcon'
 import styles from './DashboardPage.module.css'
 
 const COLUMNS: { status: Status; label: string }[] = [
-  { status: Status.BACKLOG,     label: 'Backlog' },
-  { status: Status.TODO,        label: 'To Do' },
+  { status: Status.BACKLOG, label: 'Backlog' },
+  { status: Status.TODO, label: 'To Do' },
   { status: Status.IN_PROGRESS, label: 'In Progress' },
-  { status: Status.DONE,        label: 'Done' },
-  { status: Status.CANCELLED,   label: 'Cancelled' },
+  { status: Status.DONE, label: 'Done' },
+  { status: Status.CANCELLED, label: 'Cancelled' },
 ]
 
 function DashboardContent() {
   const { tasks, loading, error } = useTasks()
   const { state, dispatch } = useTasksUI()
 
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+
   if (loading) {
-    return <div className={styles.page}><p>Loading...</p></div>
+    return <>Loading...</>
   }
 
   if (error) {
-    return <div className={styles.page}><p>Error loading tasks.</p></div>
+    return <>Error loading tasks.</>
   }
 
   return (
     <div className={styles.page}>
       <div className={styles.toolbar}>
         <div className={styles.viewToggle}>
-          <button className={styles.viewButton}><ListIcon /></button>
-          <button className={`${styles.viewButton} ${styles.viewButtonActive}`}><DashboardIcon /></button>
+          <button
+            onClick={() => navigate('/tasks')}
+            className={`${styles.viewButton} ${
+              pathname === '/tasks' ? styles.viewButtonActive : ''
+            }`}
+          >
+            <ListIcon />
+          </button>
+
+          <button
+            onClick={() => navigate('/')}
+            className={`${styles.viewButton} ${
+              pathname === '/' ? styles.viewButtonActive : ''
+            }`}
+          >
+            <DashboardIcon />
+          </button>
         </div>
+
         <button
           className={styles.addButton}
           aria-label="Add task"
@@ -43,6 +63,7 @@ function DashboardContent() {
           <PlusIcon />
         </button>
       </div>
+
       <div className={styles.columns}>
         {COLUMNS.map(({ status, label }) => (
           <TaskColumn
@@ -53,13 +74,15 @@ function DashboardContent() {
           />
         ))}
       </div>
-        <button
-          className={styles.fab}
-          aria-label="Add task"
-          onClick={() => dispatch({ type: 'OPEN_MODAL' })}
-        >
-          <PlusIcon />
-        </button>
+
+      <button
+        className={styles.fab}
+        aria-label="Add task"
+        onClick={() => dispatch({ type: 'OPEN_MODAL' })}
+      >
+        <PlusIcon />
+      </button>
+
       {state.modal.mode !== 'closed' && <TaskModal />}
     </div>
   )
