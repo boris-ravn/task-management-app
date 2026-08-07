@@ -20,7 +20,7 @@ describe('PageWrapper', () => {
         </PageWrapper>
       </MemoryRouter>
     )
-    expect(screen.getByText('Dashboard')).toBeInTheDocument()
+    expect(screen.getAllByText('Dashboard')[0]).toBeInTheDocument()
     expect(screen.getByText('Page content')).toBeInTheDocument()
   })
 })

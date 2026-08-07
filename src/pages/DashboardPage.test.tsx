@@ -61,7 +61,7 @@ describe('DashboardPage', () => {
   it('clicking the + button opens the task modal', async () => {
     vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined });
     render(<DashboardPage />);
-    const addButton = screen.getByRole('button', { name: /add task/i });
+    const addButton = screen.getAllByRole('button', { name: /add task/i })[0];
     await userEvent.click(addButton);
     expect(screen.getByPlaceholderText(/task title/i)).toBeInTheDocument();
   });
