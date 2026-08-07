@@ -50,3 +50,23 @@
   border-radius: 50%;
   background-color: var(--color-bg-surface-alt);
 }
+
+@media (max-width: 768px) {
+  .header {
+    margin: 0;
+    border-radius: 0;
+    gap: var(--spacing-12);
+  }
+
+  .actions {
+    display: contents;
+  }
+
+  .avatarButton {
+    order: -1;
+  }
+
+  .search {
+    flex-direction: row-reverse;
+  }
+}

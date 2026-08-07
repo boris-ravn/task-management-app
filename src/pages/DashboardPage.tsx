@@ -53,6 +53,13 @@ function DashboardContent() {
           />
         ))}
       </div>
+        <button
+          className={styles.fab}
+          aria-label="Add task"
+          onClick={() => dispatch({ type: 'OPEN_MODAL' })}
+        >
+          <PlusIcon />
+        </button>
       {state.modal.mode !== 'closed' && <TaskModal />}
     </div>
   )
