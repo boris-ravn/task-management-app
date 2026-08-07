@@ -34,14 +34,19 @@ const TAG_COLORS: Record<TaskTag, string> = {
   [TaskTag.RAILS]: '#4FB3A6',
 }
 
+function parseDateLocal(dateStr: string): Date {
+  const [year, month, day] = dateStr.slice(0, 10).split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
 function isOverdue(dateStr: string): boolean {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  return new Date(dateStr) < today
+  return parseDateLocal(dateStr) < today
 }
 
 function formatDueDate(dateStr: string): string {
-  const date = new Date(dateStr)
+  const date = parseDateLocal(dateStr)
   const today = new Date()
   if (date.toDateString() === today.toDateString()) return 'TODAY'
   const day = date.getDate()
