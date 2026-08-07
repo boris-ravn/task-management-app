@@ -67,6 +67,7 @@ export function TaskCard({ task }: TaskCardProps) {
       <div className={styles.header}>
         <span className={styles.title}>{task.name}</span>
         <button
+          aria-label="Task options"
           className={styles.optionsButton}
           onClick={() => setShowMenu(prev => !prev)}
         >
