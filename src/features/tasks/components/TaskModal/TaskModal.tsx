@@ -178,7 +178,13 @@ export function TaskModal() {
           <div className={styles.pickerWrapper}>
             <button type="button" className={styles.pickerButton} onClick={() => togglePicker('label')}>
               <LabelIcon />
-              <span>{form.tags.length > 0 ? form.tags.join(', ') : 'Label'}</span>
+              <span>
+                {form.tags.length === 0
+                  ? 'Label'
+                  : form.tags.length === 1
+                    ? form.tags[0]
+                    : `${form.tags.length} Labels`}
+              </span>
             </button>
             {openPicker === 'label' && (
               <ul className={styles.dropdown}>
