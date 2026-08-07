@@ -143,33 +143,29 @@ export function TaskCard({ task }: TaskCardProps) {
       </div>
 
       {showDeleteConfirm && (
-        <div className={styles.deleteConfirm}>
-          <p>Are you sure you want to delete this task?</p>
-
-          <div className={styles.deleteActions}>
-            <button
-              className={styles.deleteButton}
-              disabled={deleteLoading}
-              onClick={async() => {
-                await deleteTask({
-                  variables: {
-                    input: {
-                      id: task.id,
-                    },
-                  },
-                })
-                setShowDeleteConfirm(false)
-              }}
-            >
-              Delete
-            </button>
-
-            <button
-              className={styles.goBackButton}
-              onClick={() => setShowDeleteConfirm(false)}
-            >
-              Go back
-            </button>
+        <div className={styles.deleteOverlay} onClick={() => setShowDeleteConfirm(false)}>
+          <div className={styles.deleteDialog} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.deleteTitle}>Delete Task</h3>
+            <p className={styles.deleteBody}>Are you sure you want to delete this task?</p>
+            <hr className={styles.deleteDivider} />
+            <div className={styles.deleteActions}>
+              <button
+                className={styles.goBackButton}
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Go back
+              </button>
+              <button
+                className={styles.deleteButton}
+                disabled={deleteLoading}
+                onClick={async () => {
+                  await deleteTask({ variables: { input: { id: task.id } } })
+                  setShowDeleteConfirm(false)
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

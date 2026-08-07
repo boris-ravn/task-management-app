@@ -107,3 +107,63 @@
 .menuItem:hover {
   background: var(--color-bg-surface-alt);
 }
+
+.deleteOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteDialog {
+  background: var(--color-bg-surface);
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.deleteTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  padding: 24px 24px 12px;
+}
+
+.deleteBody {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  padding: 0 24px 20px;
+}
+
+.deleteDivider {
+  border: none;
+  border-top: 1px solid var(--color-bg-surface-alt);
+  margin: 0;
+}
+
+.deleteActions {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+.goBackButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-link);
+  font-size: 15px;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-link);
+  font-size: 15px;
+  font-weight: 700;
+}
