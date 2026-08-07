@@ -36,6 +36,14 @@
   gap: var(--spacing-16);
 }
 
+.avatarButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+}
+
 .avatar {
   width: 32px;
   height: 32px;

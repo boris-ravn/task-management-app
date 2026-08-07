@@ -1,0 +1,52 @@
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--spacing-8);
+}
+
+.backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-link);
+  margin-bottom: var(--spacing-8);
+  padding: 0;
+  font: inherit;
+}
+
+.card {
+  background: var(--color-bg-surface);
+  border-radius: 12px;
+  padding: var(--spacing-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--color-bg-surface-alt);
+}
+
+.name {
+  color: var(--color-text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
