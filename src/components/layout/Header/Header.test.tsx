@@ -18,6 +18,6 @@ describe('Header', () => {
         <Header />
       </MemoryRouter>
     )
-    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search tasks...')).toBeInTheDocument()
   })
 })
