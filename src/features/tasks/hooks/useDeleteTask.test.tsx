@@ -1,32 +1,24 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { ApolloProvider } from '@apollo/client/react';
 import { MockLink } from '@apollo/client/testing';
-import { useCreateTask } from './useCreateTask';
-import { CREATE_TASK } from '../graphql/mutations';
-import { GET_TASKS } from '../graphql/queries';
 import type { ReactNode } from 'react';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { useDeleteTask } from './useDeleteTask';
+import { DELETE_TASK } from '../graphql/mutations';
+import { GET_TASKS } from '../graphql/queries';
 
-const MOCK_INPUT = {
-  name: 'New Task',
-  dueDate: '2024-07-01',
-  pointEstimate: 'TWO',
-  status: 'TODO',
-  tags: ['IOS'],
-};
+const MOCK_INPUT = { id: '42' };
 
 const successMock: MockLink.MockedResponse = {
   request: {
-    query: CREATE_TASK,
+    query: DELETE_TASK,
     variables: { input: MOCK_INPUT },
   },
   result: {
     data: {
-      createTask: {
-        id: '1',
-        ...MOCK_INPUT,
-        assignee: null,
+      deleteTask: {
+        id: '42',
       },
     },
   },
@@ -57,11 +49,11 @@ function createWrapper(mocks: MockLink.MockedResponse[]) {
   return { client, wrapper };
 }
 
-describe('useCreateTask', () => {
-  it('starts with loading:false before the mutation is called', () => {
+describe('useDeleteTask', () => {
+  it('starts with loading: false before the mutation is called', () => {
     const { wrapper } = createWrapper([successMock, refetchMock]);
 
-    const { result } = renderHook(() => useCreateTask(), {
+    const { result } = renderHook(() => useDeleteTask(), {
       wrapper,
     });
 
@@ -70,7 +62,11 @@ describe('useCreateTask', () => {
   });
 
   it('calls the mutation and resolves without error', async () => {
-    const { client, wrapper } = createWrapper([successMock, refetchMock, refetchMock]);
+    const { client, wrapper } = createWrapper([
+      successMock,
+      refetchMock,
+      refetchMock,
+    ]);
 
     const sub = client
       .watchQuery({
@@ -79,13 +75,15 @@ describe('useCreateTask', () => {
       })
       .subscribe(() => {});
 
-    const { result } = renderHook(() => useCreateTask(), {
+    const { result } = renderHook(() => useDeleteTask(), {
       wrapper,
     });
 
     await act(async () => {
-      await result.current.createTask({
-        variables: { input: MOCK_INPUT },
+      await result.current.deleteTask({
+        variables: {
+          input: MOCK_INPUT,
+        },
       });
     });
 
