@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client/react';
 import { MockLink } from '@apollo/client/testing';
 import { useTasks } from './useTasks';
@@ -47,9 +48,11 @@ function createWrapper(mocks: MockLink.MockedResponse[]) {
     cache: new InMemoryCache(),
   });
   return ({ children }: { children: ReactNode }) => (
-    <ApolloProvider client={client}>
-      {children}
-    </ApolloProvider>
+    <MemoryRouter>
+      <ApolloProvider client={client}>
+        {children}
+      </ApolloProvider>
+    </MemoryRouter>
   );
 } 
 

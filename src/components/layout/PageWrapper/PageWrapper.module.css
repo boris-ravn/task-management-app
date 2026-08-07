@@ -16,3 +16,9 @@
   overflow-y: auto;
   padding: var(--spacing-16);
 }
+
+@media (max-width: 768px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
+}

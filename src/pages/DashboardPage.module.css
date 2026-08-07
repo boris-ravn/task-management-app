@@ -51,3 +51,35 @@
   padding-bottom: var(--spacing-16);
   flex: 1;
 }
+
+.fab {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+
+    width: 56px;
+    height: 56px;
+
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+
+    background-color: var(--color-danger);
+    color: var(--color-text-primary);
+
+    z-index: 10;
+  }
+
+  .toolbar {
+    display: none;
+  }
+}

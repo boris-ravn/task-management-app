@@ -36,9 +36,37 @@
   gap: var(--spacing-16);
 }
 
+.avatarButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+}
+
 .avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   background-color: var(--color-bg-surface-alt);
+}
+
+@media (max-width: 768px) {
+  .header {
+    margin: 0;
+    border-radius: 0;
+    gap: var(--spacing-12);
+  }
+
+  .actions {
+    display: contents;
+  }
+
+  .avatarButton {
+    order: -1;
+  }
+
+  .search {
+    flex-direction: row-reverse;
+  }
 }
