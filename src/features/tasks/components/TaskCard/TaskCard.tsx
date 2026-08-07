@@ -8,6 +8,7 @@ import { DeleteIcon } from '../../../../components/ui/icons/DeleteIcon'
 import { useTasksUI } from '../../context/TasksUIContext'
 import { useDeleteTask } from '../../hooks/useDeleteTask'
 import styles from './TaskCard.module.css'
+import { normalizeAvatarUrl } from '../../../../lib/avatar';
 
 const POINT_LABELS: Record<PointEstimate, string> = {
   [PointEstimate.ZERO]: '0',
@@ -133,7 +134,7 @@ export function TaskCard({ task }: TaskCardProps) {
       <div className={styles.footer}>
         {task.assignee ? (
           <img
-            src={task.assignee.avatar ?? undefined}
+            src={normalizeAvatarUrl(task.assignee.avatar)}
             alt={task.assignee.fullName}
             className={styles.avatar}
           />
