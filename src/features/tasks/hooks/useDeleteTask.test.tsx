@@ -42,6 +42,9 @@ const deleteSuccessMock: MockLink.MockedResponse = {
   result: { data: { deleteTask: { __typename: 'Task', id: DOOMED_ID } } },
 };
 
+// Slow enough that the optimistic layer can be observed before the server answers.
+const deleteDelayedMock: MockLink.MockedResponse = { ...deleteSuccessMock, delay: 100 };
+
 const deleteErrorMock: MockLink.MockedResponse = {
   request: { query: DELETE_TASK, variables: { input: { id: DOOMED_ID } } },
   error: new Error('Network error'),
@@ -60,10 +63,14 @@ function createWrapper(mocks: MockLink.MockedResponse[]) {
   return { client, cache, wrapper };
 }
 
+// optimistic: true reads the top cache layer, which is what a subscribed component
+// sees. readQuery defaults to the root layer and so cannot observe a pending
+// optimistic write at all.
 function cachedIds(client: ApolloClient, variables: Record<string, unknown>) {
   const data = client.readQuery<{ tasks: { id: string }[] }>({
     query: GET_TASKS,
     variables,
+    optimistic: true,
   });
   return data?.tasks.map((t) => t.id) ?? null;
 }
@@ -99,6 +106,35 @@ describe('useDeleteTask', () => {
 
     expect(cachedIds(client, UNFILTERED_INPUT)).toEqual([SURVIVOR_ID]);
     expect(cachedIds(client, FILTERED_INPUT)).toEqual([]);
+  });
+
+  // Guards the optimistic layer AND the __typename that makes it normalize. Every
+  // other test here asserts the settled state, which the real result produces on
+  // its own, so they all still pass if the optimistic response is deleted.
+  it('removes the task before the server responds', async () => {
+    const { client, wrapper } = createWrapper([unfilteredListMock, deleteDelayedMock]);
+
+    await client.query({ query: GET_TASKS, variables: UNFILTERED_INPUT });
+
+    const { result } = renderHook(() => useDeleteTask(), { wrapper });
+
+    let settled!: Promise<unknown>;
+    await act(async () => {
+      settled = result.current.deleteTask(DOOMED_ID);
+      // mutate() awaits before writing the optimistic layer, so yield once to let
+      // it land. The mocked link is still 100ms from answering.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(cachedIds(client, UNFILTERED_INPUT)).toEqual([SURVIVOR_ID]);
+
+    await act(async () => {
+      await settled;
+    });
+
+    // Still gone once the real result reconciles — the optimistic write does not
+    // flicker back before the eviction is reapplied.
+    expect(cachedIds(client, UNFILTERED_INPUT)).toEqual([SURVIVOR_ID]);
   });
 
   it('evicts the entity itself, not just the list entries', async () => {
