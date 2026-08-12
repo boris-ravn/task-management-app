@@ -80,11 +80,7 @@ describe('useDeleteTask', () => {
     });
 
     await act(async () => {
-      await result.current.deleteTask({
-        variables: {
-          input: MOCK_INPUT,
-        },
-      });
+      await result.current.deleteTask(MOCK_INPUT.id);
     });
 
     await waitFor(() => {

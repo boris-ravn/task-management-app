@@ -52,7 +52,7 @@ export function TaskCard({ task }: TaskCardProps) {
 
   const handleDelete = async () => {
     try {
-      await deleteTask({ variables: { input: { id: task.id } } })
+      await deleteTask(task.id)
       showToast('success', 'Task deleted')
       setShowDeleteConfirm(false)
     } catch (error) {

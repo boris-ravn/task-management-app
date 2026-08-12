@@ -144,13 +144,7 @@ describe('TaskCard', () => {
 
     await userEvent.click(screen.getByText('Delete'))
 
-    expect(mockDeleteTask).toHaveBeenCalledWith({
-      variables: {
-        input: {
-          id: MOCK_TASK.id,
-        },
-      },
-    })
+    expect(mockDeleteTask).toHaveBeenCalledWith(MOCK_TASK.id)
   })
 
   it('shows a success toast and closes the dialog when delete succeeds', async () => {
