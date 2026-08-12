@@ -27,6 +27,9 @@ export function useTasks(): UseTasksResult {
 
   const { data, loading, error, refetch } = useQuery<GetTasksData>(GET_TASKS, {
     variables: { input },
+    // The cache holds a separate list per filter. Revalidating on view is what
+    // stops a list another mutation made stale from being served indefinitely.
+    fetchPolicy: 'cache-and-network',
   });
 
   useLogQueryError(error, 'loadTasks');

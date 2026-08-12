@@ -24,7 +24,10 @@ function DashboardContent() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
-  if (loading) {
+  // Both guards require an empty list: with cache-and-network, `loading` and
+  // `error` also occur during background revalidation, when there is still
+  // perfectly good data on screen that must not be replaced.
+  if (loading && tasks.length === 0) {
     return (
       <div className={styles.page}>
         <div className={styles.empty}>
@@ -34,7 +37,7 @@ function DashboardContent() {
     )
   }
 
-  if (error) {
+  if (error && tasks.length === 0) {
     return (
       <div className={styles.page}>
         <div className={styles.empty}>
