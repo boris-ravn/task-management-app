@@ -40,10 +40,12 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
 export function ToastContainer() {
   const { toasts, dismissToast } = useToast()
 
-  if (toasts.length === 0) return null
-
+  // The wrapper renders even when empty and carries aria-live: screen readers only
+  // announce content added to a region that already existed. Injecting a
+  // role="status" node and its text at the same moment is commonly missed, so
+  // mounting on demand would silently drop every success notification.
   return (
-    <div className={styles.container}>
+    <div className={styles.container} aria-live="polite">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />
       ))}

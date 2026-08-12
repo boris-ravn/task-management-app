@@ -20,10 +20,31 @@ function renderWithToast(children: ReactNode) {
 }
 
 describe('ToastContainer', () => {
-  it('renders nothing when there are no toasts', () => {
+  it('renders no toasts when the queue is empty', () => {
     renderWithToast(null)
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  // Screen readers only announce content added to a region that already existed,
+  // so the live region has to outlive the toasts it hosts.
+  it('keeps the live region mounted while the queue is empty', () => {
+    const { container } = renderWithToast(null)
+
+    const liveRegion = container.querySelector('[aria-live="polite"]')
+    expect(liveRegion).toBeInTheDocument()
+    expect(liveRegion).toBeEmptyDOMElement()
+  })
+
+  it('adds toasts into the pre-existing live region', async () => {
+    const { container } = renderWithToast(
+      <ShowToastOnMount variant="success" message="Task created" />,
+    )
+    const liveRegion = container.querySelector('[aria-live="polite"]')
+
+    await userEvent.click(screen.getByText('trigger'))
+
+    expect(liveRegion).toContainElement(screen.getByRole('status'))
   })
 
   it('renders a success toast with role status', async () => {

@@ -9,6 +9,10 @@
 
   /* Above the task modal, which sits at 1001. */
   z-index: 2000;
+
+  /* The wrapper is always mounted for the live region, so it must never swallow
+     clicks; only the toasts themselves are interactive. */
+  pointer-events: none;
 }
 
 .toast {
@@ -24,6 +28,8 @@
   border-left: 4px solid transparent;
   background-color: var(--color-bg-surface-alt);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  pointer-events: auto;
 }
 
 .toastSuccess {
