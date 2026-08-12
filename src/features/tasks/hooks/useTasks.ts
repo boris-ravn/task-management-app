@@ -8,6 +8,8 @@ interface UseTasksResult {
   tasks: Task[];
   loading: boolean;
   error: Error | undefined;
+  /** The debounced term actually sent to the API, so callers never describe stale results. */
+  searchTerm: string;
 }
 
 interface GetTasksData {
@@ -29,5 +31,6 @@ export function useTasks(): UseTasksResult {
     tasks: data?.tasks ?? [],
     loading,
     error,
+    searchTerm: debouncedQ,
   };
 }

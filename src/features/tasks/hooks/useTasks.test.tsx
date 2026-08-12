@@ -78,6 +78,14 @@ describe('useTasks', () => {
     
     expect(result.current.tasks[0].name).toEqual(MOCK_TASK.name);
   });
+  it('reports an empty searchTerm when there is no ?q= param', () => {
+    const { result } = renderHook(() => useTasks(), {
+      wrapper: createWrapper([successMock]),
+    });
+
+    expect(result.current.searchTerm).toBe('');
+  });
+
 
   it('returns an error when the query fails', async () => {
     const { result } = renderHook(() => useTasks(), {

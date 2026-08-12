@@ -52,6 +52,18 @@
   flex: 1;
 }
 
+.empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyLabel {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
 .fab {
   display: none;
 }

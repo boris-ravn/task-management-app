@@ -18,7 +18,7 @@ const COLUMNS: { status: Status; label: string }[] = [
 ]
 
 function DashboardContent() {
-  const { tasks, loading, error } = useTasks()
+  const { tasks, loading, error, searchTerm } = useTasks()
   const { state, dispatch } = useTasksUI()
 
   const navigate = useNavigate()
@@ -64,16 +64,24 @@ function DashboardContent() {
         </button>
       </div>
 
-      <div className={styles.columns}>
-        {COLUMNS.map(({ status, label }) => (
-          <TaskColumn
-            key={status}
-            status={status}
-            label={label}
-            tasks={tasks.filter((task) => task.status === status)}
-          />
-        ))}
-      </div>
+      {tasks.length === 0 ? (
+        <div className={styles.empty}>
+          <p className={styles.emptyLabel}>
+            {searchTerm ? `No tasks match "${searchTerm}"` : 'No tasks yet'}
+          </p>
+        </div>
+      ) : (
+        <div className={styles.columns}>
+          {COLUMNS.map(({ status, label }) => (
+            <TaskColumn
+              key={status}
+              status={status}
+              label={label}
+              tasks={tasks.filter((task) => task.status === status)}
+            />
+          ))}
+        </div>
+      )}
 
       <button
         className={styles.fab}
