@@ -106,8 +106,6 @@ function renderModalInEditMode() {
   );
 }
 
-// The Create button stays disabled until name, estimate, due date and at least one
-// tag are set, so the create-path tests have to walk the pickers.
 async function fillRequiredFields() {
   await userEvent.type(screen.getByPlaceholderText('Task Title'), 'New task');
 

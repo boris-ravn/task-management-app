@@ -71,7 +71,6 @@ export function TaskModal() {
     form.dueDate !== '' &&
     form.tags.length > 0;
 
-  // On failure the modal stays open with the form intact, so the user can retry.
   const handleSubmit = async () => {
     const input = {
       name: form.name,

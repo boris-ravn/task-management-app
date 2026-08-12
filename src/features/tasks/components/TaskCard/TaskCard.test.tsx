@@ -39,8 +39,6 @@ const MOCK_TASK: Task = {
   },
 } as Task
 
-// Real ToastProvider rather than a mock, so tests assert the user-visible
-// notification instead of a spy call.
 function renderCard(task: Task = MOCK_TASK) {
   return render(
     <ToastProvider>

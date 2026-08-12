@@ -14,8 +14,6 @@ export function ProfilePage() {
     );
   }
 
-  // A successful response with no profile leaves the page just as unusable as a
-  // failed one, so both take the same recoverable error state.
   if (error || !user) {
     return (
       <div className={styles.page}>

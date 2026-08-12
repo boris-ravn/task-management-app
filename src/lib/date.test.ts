@@ -32,7 +32,6 @@ describe('date helpers', () => {
     });
 
     it('does not shift the calendar day the way new Date(string) does', () => {
-      // new Date('2026-09-01') is midnight UTC, which is Aug 31 in any negative offset.
       expect(parseDateLocal('2026-09-01').getDate()).toBe(1);
     });
   });

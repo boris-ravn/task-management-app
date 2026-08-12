@@ -14,7 +14,6 @@ interface UseProfileResult {
   user: User | undefined;
   loading: boolean;
   error: Error | undefined;
-  /** Re-runs the query, for a retry control on the error state. */
   retry: () => void;
 }
 

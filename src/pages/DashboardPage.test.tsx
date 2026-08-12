@@ -36,7 +36,6 @@ vi.mock('../features/tasks/hooks/useUpdateTask', () => ({
   }),
 }));
 
-// Needed once the board renders real TaskCards.
 vi.mock('../features/tasks/hooks/useDeleteTask', () => ({
   useDeleteTask: () => ({
     deleteTask: vi.fn(),

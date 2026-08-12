@@ -9,9 +9,8 @@ interface UseTasksResult {
   tasks: Task[];
   loading: boolean;
   error: Error | undefined;
-  /** The debounced term actually sent to the API, so callers never describe stale results. */
+  /** The debounced term actually sent to the API, not the raw URL param. */
   searchTerm: string;
-  /** Re-runs the query, for a retry control on the error state. */
   retry: () => void;
 }
 
