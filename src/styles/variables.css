@@ -9,6 +9,7 @@
   --color-text-muted: #94979A;
 
   /* Semantic / accent */
+  --color-success: #70B252;      /* success notifications */
   --color-danger: #DA584B;       /* "+" button, Create/Delete actions, overdue date badge */
   --color-danger-soft: #EBA59E;  /* disabled state of Create/Delete button */
   --color-link: #4098FF;         /* "Go back" / "Delete" text links in the delete-confirm popover */
