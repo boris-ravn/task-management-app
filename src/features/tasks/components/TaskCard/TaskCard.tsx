@@ -6,10 +6,12 @@ import { OptionsIcon } from '../../../../components/ui/icons/OptionsIcon'
 import { EditIcon } from '../../../../components/ui/icons/EditIcon'
 import { DeleteIcon } from '../../../../components/ui/icons/DeleteIcon'
 import { useTasksUI } from '../../context/TasksUIContext'
+import { useToast } from '../../../../context/ToastContext/ToastContext'
 import { useDeleteTask } from '../../hooks/useDeleteTask'
 import styles from './TaskCard.module.css'
 import { normalizeAvatarUrl } from '../../../../lib/avatar';
 import { isOverdue, formatDueDate } from '../../../../lib/date';
+import { logError } from '../../../../lib/error-logger';
 
 const POINT_LABELS: Record<PointEstimate, string> = {
   [PointEstimate.ZERO]: '0',
@@ -43,9 +45,21 @@ export function TaskCard({ task }: TaskCardProps) {
   const overdue = isOverdue(task.dueDate)
 
   const { dispatch } = useTasksUI()
+  const { showToast } = useToast()
   const { deleteTask, loading: deleteLoading } = useDeleteTask()
   const [showMenu, setShowMenu] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  const handleDelete = async () => {
+    try {
+      await deleteTask({ variables: { input: { id: task.id } } })
+      showToast('success', 'Task deleted')
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      logError(error, { action: 'deleteTask', taskId: task.id })
+      showToast('error', 'Could not delete task')
+    }
+  }
 
   return (
     <div className={styles.card}>
@@ -144,10 +158,7 @@ export function TaskCard({ task }: TaskCardProps) {
               <button
                 className={styles.deleteButton}
                 disabled={deleteLoading}
-                onClick={async () => {
-                  await deleteTask({ variables: { input: { id: task.id } } })
-                  setShowDeleteConfirm(false)
-                }}
+                onClick={handleDelete}
               >
                 Delete
               </button>

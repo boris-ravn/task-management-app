@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ToastProvider } from '../../../../context/ToastContext/ToastContext';
+import { ToastContainer } from '../../../../components/ui/Toast/ToastContainer';
 import { TaskModal } from './TaskModal';
 import { TasksUIProvider, useTasksUI } from '../../context/TasksUIContext';
 import { useEffect } from 'react';
@@ -82,17 +84,23 @@ function OpenAndRenderInEditMode() {
 
 function renderModal() {
   render(
-    <TasksUIProvider>
-      <OpenAndRender />
-    </TasksUIProvider>
+    <ToastProvider>
+      <TasksUIProvider>
+        <OpenAndRender />
+      </TasksUIProvider>
+      <ToastContainer />
+    </ToastProvider>
   );
 }
 
 function renderModalInEditMode() {
   render(
-    <TasksUIProvider>
-      <OpenAndRenderInEditMode />
-    </TasksUIProvider>,
+    <ToastProvider>
+      <TasksUIProvider>
+        <OpenAndRenderInEditMode />
+      </TasksUIProvider>
+      <ToastContainer />
+    </ToastProvider>,
   );
 }
 

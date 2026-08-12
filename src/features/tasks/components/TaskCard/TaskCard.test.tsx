@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { ToastProvider } from '../../../../context/ToastContext/ToastContext'
+import { ToastContainer } from '../../../../components/ui/Toast/ToastContainer'
 import { TaskCard } from './TaskCard'
 import { Status, TaskTag, PointEstimate } from '../../types'
 import type { Task } from '../../types'
@@ -36,23 +38,34 @@ const MOCK_TASK: Task = {
   },
 } as Task
 
+// Real ToastProvider rather than a mock, so tests assert the user-visible
+// notification instead of a spy call.
+function renderCard(task: Task = MOCK_TASK) {
+  return render(
+    <ToastProvider>
+      <TaskCard task={task} />
+      <ToastContainer />
+    </ToastProvider>,
+  )
+}
+
 describe('TaskCard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('renders the task name', () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
     expect(screen.getByText(MOCK_TASK.name)).toBeInTheDocument()
   })
 
   it('renders the point estimate', () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
     expect(screen.getByText('4 Points')).toBeInTheDocument()
   })
 
   it('renders the task tags', () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
     expect(screen.getByText('REACT')).toBeInTheDocument()
     expect(screen.getByText('NODE.JS')).toBeInTheDocument()
   })
@@ -70,21 +83,21 @@ describe('TaskCard', () => {
     })
 
     it('renders "TODAY" when the due date is today', () => {
-      render(<TaskCard task={MOCK_TASK} />)
+      renderCard()
       expect(screen.getByTestId('due-date')).toHaveTextContent('TODAY')
     })
 
     it('applies overdue class for past due date', () => {
       const pastTask = { ...MOCK_TASK, dueDate: '2026-06-14T00:00:00.000Z' }
 
-      render(<TaskCard task={pastTask} />)
+      renderCard(pastTask)
       expect(screen.getByTestId('due-date').className).toContain('dueDateOverdue')
     })
   })
 
 
   it('clicking ⋯ shows Edit and Delete buttons', async () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
 
     await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
 
@@ -93,7 +106,7 @@ describe('TaskCard', () => {
   })
 
   it('clicking Edit dispatches OPEN_MODAL_FOR_EDIT with the task', async () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
 
     await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
     await userEvent.click(screen.getByText('Edit'))
@@ -105,7 +118,7 @@ describe('TaskCard', () => {
   })
 
   it('clicking Delete shows the confirmation message', async () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
 
     await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
     await userEvent.click(screen.getByText('Delete'))
@@ -114,7 +127,7 @@ describe('TaskCard', () => {
   })
 
   it('clicking Go back hides the confirmation', async () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
 
     await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
     await userEvent.click(screen.getByText('Delete'))
@@ -124,7 +137,7 @@ describe('TaskCard', () => {
   })
 
   it('clicking confirm Delete calls deleteTask with the task id', async () => {
-    render(<TaskCard task={MOCK_TASK} />)
+    renderCard()
 
     await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
 

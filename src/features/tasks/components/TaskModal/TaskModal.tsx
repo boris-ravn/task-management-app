@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useTasksUI } from '../../context/TasksUIContext';
+import { useToast } from '../../../../context/ToastContext/ToastContext';
+import { logError } from '../../../../lib/error-logger';
 import { useCreateTask } from '../../hooks/useCreateTask';
 import { useUpdateTask } from '../../hooks/useUpdateTask';
 import { useUsers } from '../../hooks/useUsers';
@@ -35,6 +37,7 @@ const STATUS_OPTIONS = Object.values(Status);
 
 export function TaskModal() {
   const { state, dispatch } = useTasksUI();
+  const { showToast } = useToast();
   const { createTask, loading: createLoading } = useCreateTask();
   const { updateTask, loading: updateLoading } = useUpdateTask();
   const { users } = useUsers();
@@ -68,38 +71,37 @@ export function TaskModal() {
     form.dueDate !== '' &&
     form.tags.length > 0;
 
+  // On failure the modal stays open with the form intact, so the user can retry.
   const handleSubmit = async () => {
+    const input = {
+      name: form.name,
+      status: form.status,
+      pointEstimate: form.pointEstimate,
+      dueDate: form.dueDate,
+      tags: form.tags,
+      assigneeId: form.assigneeId || undefined,
+    };
+
     if (isEditMode) {
-      await updateTask({
-        variables: {
-          input: {
-            id: editingTask!.id,
-            name: form.name,
-            status: form.status,
-            pointEstimate: form.pointEstimate,
-            dueDate: form.dueDate,
-            tags: form.tags,
-            assigneeId: form.assigneeId || undefined,
-          },
-        },
-      });
-      dispatch({ type: 'CLOSE_MODAL' });
+      try {
+        await updateTask({ variables: { input: { id: editingTask.id, ...input } } });
+        showToast('success', 'Task updated');
+        dispatch({ type: 'CLOSE_MODAL' });
+      } catch (error) {
+        logError(error, { action: 'updateTask', taskId: editingTask.id });
+        showToast('error', 'Could not update task');
+      }
       return;
     }
 
-    await createTask({
-      variables: {
-        input: {
-          name: form.name,
-          status: form.status,
-          pointEstimate: form.pointEstimate,
-          dueDate: form.dueDate,
-          tags: form.tags,
-          assigneeId: form.assigneeId || undefined,
-        },
-      },
-    });
-    dispatch({ type: 'CLOSE_MODAL' });
+    try {
+      await createTask({ variables: { input } });
+      showToast('success', 'Task created');
+      dispatch({ type: 'CLOSE_MODAL' });
+    } catch (error) {
+      logError(error, { action: 'createTask' });
+      showToast('error', 'Could not create task');
+    }
   };
 
   const selectedAssignee = users.find((u) => u.id === form.assigneeId);

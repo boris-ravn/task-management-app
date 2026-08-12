@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
+import { ToastProvider } from '../context/ToastContext/ToastContext';
 import { DashboardPage } from './DashboardPage';
 import { useTasks } from '../features/tasks/hooks/useTasks';
 
@@ -39,19 +40,19 @@ describe('DashboardPage', () => {
   });
 
   it('renders a loading indicator while tasks are loading', () => {
-    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+    render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
   it('renders an error message when tasks fail to load', () => {
     vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: new Error('fail') });
-    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+    render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     expect(screen.getByText(/error/i)).toBeInTheDocument();
   });
 
   it('renders all five column labels', () => {
     vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined });
-    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+    render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     expect(screen.getByText(/backlog/i)).toBeInTheDocument();
     expect(screen.getByText(/to do/i)).toBeInTheDocument();
     expect(screen.getByText(/in progress/i)).toBeInTheDocument();
@@ -61,7 +62,7 @@ describe('DashboardPage', () => {
 
   it('clicking the + button opens the task modal', async () => {
     vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined });
-    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+    render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     const addButton = screen.getAllByRole('button', { name: /add task/i })[0];
     await userEvent.click(addButton);
     expect(screen.getByPlaceholderText(/task title/i)).toBeInTheDocument();

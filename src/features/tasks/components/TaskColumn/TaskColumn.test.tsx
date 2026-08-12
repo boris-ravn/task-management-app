@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { ToastProvider } from '../../../../context/ToastContext/ToastContext'
 import { TaskColumn } from './TaskColumn'
 import { Status, TaskTag, PointEstimate, UserType } from '../../types'
 import type { Task } from '../../types'
@@ -30,24 +31,24 @@ const MOCK_TASKS: Task[] = [
 describe('TaskColumn', () => {
 
   it('renders the column label', () => {
-    render(<TaskColumn status={Status.TODO} label="To Do" tasks={MOCK_TASKS} />)
+    render(<ToastProvider><TaskColumn status={Status.TODO} label="To Do" tasks={MOCK_TASKS} /></ToastProvider>)
     expect(screen.getByText('To Do')).toBeInTheDocument()
   })
 
   it('renders the correct task count', () => {
-    render(<TaskColumn status={Status.TODO} label="To Do" tasks={MOCK_TASKS} />)
+    render(<ToastProvider><TaskColumn status={Status.TODO} label="To Do" tasks={MOCK_TASKS} /></ToastProvider>)
     expect(screen.getByText('(02)')).toBeInTheDocument()
   })
 
   it('renders a TaskCard for each task', () => {
-    render(<TaskColumn status={Status.TODO} label="To Do" tasks={MOCK_TASKS} />)
+    render(<ToastProvider><TaskColumn status={Status.TODO} label="To Do" tasks={MOCK_TASKS} /></ToastProvider>)
     MOCK_TASKS.forEach(task => {
       expect(screen.getByText(task.name)).toBeInTheDocument()
     })
   })
 
   it('renders an empty list without crashing', () => {
-    render(<TaskColumn status={Status.TODO} label="To Do" tasks={[]} />)
+    render(<ToastProvider><TaskColumn status={Status.TODO} label="To Do" tasks={[]} /></ToastProvider>)
     expect(screen.getByText('To Do')).toBeInTheDocument()
     expect(screen.getByText('(00)')).toBeInTheDocument()
   })
