@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { TaskCard } from './TaskCard'
 import { Status, TaskTag, PointEstimate } from '../../types'
 import type { Task } from '../../types'
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 const mockDispatch = vi.hoisted(() => vi.fn())
 const mockDeleteTask = vi.hoisted(() => vi.fn().mockResolvedValue({}))
@@ -26,7 +26,7 @@ const MOCK_TASK: Task = {
   status: Status.TODO,
   tags: [TaskTag.REACT, TaskTag.NODE_JS],
   pointEstimate: PointEstimate.FOUR,
-  dueDate: new Date().toISOString(),
+  dueDate: '2026-06-15T00:00:00.000Z',
   assignee: null,
   creator: {
     id: 'u1',
@@ -57,21 +57,29 @@ describe('TaskCard', () => {
     expect(screen.getByText('NODE.JS')).toBeInTheDocument()
   })
 
-  it('renders "TODAY" for due date when task.dueDate is today', () => {
-    const todayTask = { ...MOCK_TASK, dueDate: new Date().toISOString() }
-    render(<TaskCard task={todayTask} />)
-    expect(screen.getByTestId('due-date')).toHaveTextContent('TODAY')
-  })
+  // Scoped to these two tests: they need a frozen clock, and fake timers would
+  // stall the userEvent-driven tests below.
+  describe('due date', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(2026, 5, 15, 12, 0, 0))
+    })
 
-  it('applies overdue class for past due date', () => {
-    const pastTask = {
-      ...MOCK_TASK,
-      dueDate: new Date(Date.now() - 86400000).toISOString(),
-    }
+    afterEach(() => {
+      vi.useRealTimers()
+    })
 
-    render(<TaskCard task={pastTask} />)
-    const dueDateElement = screen.getByTestId('due-date')
-    expect(dueDateElement.className).toContain('dueDateOverdue')
+    it('renders "TODAY" when the due date is today', () => {
+      render(<TaskCard task={MOCK_TASK} />)
+      expect(screen.getByTestId('due-date')).toHaveTextContent('TODAY')
+    })
+
+    it('applies overdue class for past due date', () => {
+      const pastTask = { ...MOCK_TASK, dueDate: '2026-06-14T00:00:00.000Z' }
+
+      render(<TaskCard task={pastTask} />)
+      expect(screen.getByTestId('due-date').className).toContain('dueDateOverdue')
+    })
   })
 
 
