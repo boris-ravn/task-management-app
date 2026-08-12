@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ToastProvider } from '../../../../context/ToastContext/ToastContext'
 import { ToastContainer } from '../../../../components/ui/Toast/ToastContainer'
+import { getLoggedErrors, clearLoggedErrors } from '../../../../lib/error-logger'
 import { TaskCard } from './TaskCard'
 import { Status, TaskTag, PointEstimate } from '../../types'
 import type { Task } from '../../types'
@@ -151,6 +152,39 @@ describe('TaskCard', () => {
           id: MOCK_TASK.id,
         },
       },
+    })
+  })
+
+  it('shows a success toast and closes the dialog when delete succeeds', async () => {
+    renderCard()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
+    await userEvent.click(screen.getByText('Delete'))
+    await userEvent.click(screen.getByText('Delete'))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Task deleted')
+    expect(screen.queryByText(/are you sure/i)).not.toBeInTheDocument()
+  })
+
+  describe('when delete fails', () => {
+    beforeEach(() => {
+      clearLoggedErrors()
+      mockDeleteTask.mockRejectedValueOnce(new Error('Network error'))
+    })
+
+    it('shows an error toast, keeps the dialog open, and logs the error', async () => {
+      renderCard()
+
+      await userEvent.click(screen.getByRole('button', { name: 'Task options' }))
+      await userEvent.click(screen.getByText('Delete'))
+      await userEvent.click(screen.getByText('Delete'))
+
+      expect(screen.getByRole('alert')).toHaveTextContent('Could not delete task')
+      expect(screen.getByText(/are you sure/i)).toBeInTheDocument()
+
+      const [entry] = getLoggedErrors()
+      expect(entry.message).toBe('Network error')
+      expect(entry.context).toEqual({ action: 'deleteTask', taskId: MOCK_TASK.id })
     })
   })
 })

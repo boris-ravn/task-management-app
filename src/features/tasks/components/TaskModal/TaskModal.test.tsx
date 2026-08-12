@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '../../../../context/ToastContext/ToastContext';
 import { ToastContainer } from '../../../../components/ui/Toast/ToastContainer';
+import { getLoggedErrors, clearLoggedErrors } from '../../../../lib/error-logger';
 import { TaskModal } from './TaskModal';
 import { TasksUIProvider, useTasksUI } from '../../context/TasksUIContext';
 import { useEffect } from 'react';
@@ -10,10 +11,11 @@ import { Status, TaskTag, PointEstimate, UserType } from '../../types';
 import type { Task } from '../../types';
 
 const mockUpdateTask = vi.hoisted(() => vi.fn().mockResolvedValue({}))
+const mockCreateTask = vi.hoisted(() => vi.fn().mockResolvedValue({}))
 
 vi.mock('../../hooks/useCreateTask', () => ({
   useCreateTask: () => ({
-    createTask: vi.fn(),
+    createTask: mockCreateTask,
     loading: false,
     error: undefined,
   }),
@@ -104,6 +106,21 @@ function renderModalInEditMode() {
   );
 }
 
+// The Create button stays disabled until name, estimate, due date and at least one
+// tag are set, so the create-path tests have to walk the pickers.
+async function fillRequiredFields() {
+  await userEvent.type(screen.getByPlaceholderText('Task Title'), 'New task');
+
+  await userEvent.click(screen.getByText('Estimate'));
+  await userEvent.click(screen.getByText('TWO'));
+
+  await userEvent.click(screen.getByText('Label'));
+  await userEvent.click(screen.getByRole('checkbox', { name: 'REACT' }));
+
+  await userEvent.click(screen.getByText('Due Date'));
+  fireEvent.change(screen.getByDisplayValue(''), { target: { value: '2026-09-01' } });
+}
+
 describe('TaskModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -177,5 +194,44 @@ describe('TaskModal', () => {
         },
       },
     });
+  });
+
+  it('shows a success toast and closes the modal when update succeeds', async () => {
+    renderModalInEditMode();
+
+    await userEvent.click(screen.getByText('Update'));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Task updated');
+    expect(screen.queryByPlaceholderText('Task Title')).not.toBeInTheDocument();
+  });
+
+  it('shows an error toast and keeps the modal open when update fails', async () => {
+    clearLoggedErrors();
+    mockUpdateTask.mockRejectedValueOnce(new Error('Network error'));
+    renderModalInEditMode();
+
+    await userEvent.click(screen.getByText('Update'));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not update task');
+    expect(screen.getByPlaceholderText('Task Title')).toHaveValue(MOCK_TASK.name);
+
+    const [entry] = getLoggedErrors();
+    expect(entry.message).toBe('Network error');
+    expect(entry.context).toEqual({ action: 'updateTask', taskId: MOCK_TASK.id });
+  });
+
+  it('shows an error toast and keeps the modal open when create fails', async () => {
+    clearLoggedErrors();
+    mockCreateTask.mockRejectedValueOnce(new Error('Network error'));
+    renderModal();
+
+    await fillRequiredFields();
+    await userEvent.click(screen.getByText('Create'));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not create task');
+    expect(screen.getByPlaceholderText('Task Title')).toHaveValue('New task');
+
+    const [entry] = getLoggedErrors();
+    expect(entry.context).toEqual({ action: 'createTask' });
   });
 })
