@@ -9,6 +9,7 @@ import { useTasksUI } from '../../context/TasksUIContext'
 import { useDeleteTask } from '../../hooks/useDeleteTask'
 import styles from './TaskCard.module.css'
 import { normalizeAvatarUrl } from '../../../../lib/avatar';
+import { isOverdue, formatDueDate } from '../../../../lib/date';
 
 const POINT_LABELS: Record<PointEstimate, string> = {
   [PointEstimate.ZERO]: '0',
@@ -32,27 +33,6 @@ const TAG_COLORS: Record<TaskTag, string> = {
   [TaskTag.NODE_JS]: '#9B7FE0',
   [TaskTag.REACT]: '#4098FF',
   [TaskTag.RAILS]: '#4FB3A6',
-}
-
-function parseDateLocal(dateStr: string): Date {
-  const [year, month, day] = dateStr.slice(0, 10).split('-').map(Number)
-  return new Date(year, month - 1, day)
-}
-
-function isOverdue(dateStr: string): boolean {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return parseDateLocal(dateStr) < today
-}
-
-function formatDueDate(dateStr: string): string {
-  const date = parseDateLocal(dateStr)
-  const today = new Date()
-  if (date.toDateString() === today.toDateString()) return 'TODAY'
-  const day = date.getDate()
-  const month = date.toLocaleString('en-US', { month: 'long' })
-  const year = date.getFullYear()
-  return `${day} ${month}, ${year}`.toUpperCase()
 }
 
 interface TaskCardProps {
