@@ -24,7 +24,11 @@ A Trello-style kanban board built as a capstone project for RAVN's frontend trai
 
 2. **Configure environment variables**
 
-   Create a `.env` file at the project root:
+   Copy `.env.example` to `.env` at the project root and fill in both values:
+
+   ```bash
+   cp .env.example .env
+   ```
 
    ```env
    VITE_GRAPHQL_ENDPOINT=https://<your-api-host>/graphql
@@ -214,7 +218,7 @@ Two non-obvious details this relies on:
 
 This is why `DashboardPage` guards on `loading && tasks.length === 0` rather than `loading` alone. Under `cache-and-network`, `loading` is also true during background revalidation, when there is good data on screen that must not be replaced by a placeholder.
 
-The `error` branch needs no equivalent check. With the default `errorPolicy`, an errored query reports no data at all — measured as `dataState: 'empty'` even when the cache holds the list, and `errorPolicy: 'all'` does not change this for *network* failures. So `error` and an empty list always coincide: a failed revalidation blanks the board and shows the error with a retry, rather than going quietly stale. Preserving the last good list through a failed refetch would mean holding it outside Apollo, which is not currently done.
+The `error` branch has no equivalent check, and that is a deliberate simplification rather than a proven invariant. Whether a failed revalidation still has data to show depends on cache warmth: within a session an errored query can report the cached list (`dataState: 'complete'`), whereas a reload with the network already broken has nothing to report at all, because `InMemoryCache` is not persisted across reloads. `errorPolicy: 'all'` does not help either way — it discards the data on network failures. `DashboardPage` therefore treats any `error` as the error state: unavoidable when the cache is cold, and in the warm case a deliberate trade of a silently stale board for an explicit message with a working retry.
 
 ---
 
@@ -250,6 +254,7 @@ Scoped out deliberately, listed so they are not mistaken for oversights:
 
 - **Empty states are board-level only.** An individual empty column still renders a blank gap under its `(00)` badge, and the assignee dropdown renders an empty box while `GET_USERS` is in flight.
 - **No error boundary.** A render-time throw still blanks the app; only async mutation failures are handled.
+- **A failed background revalidation replaces the board with the error state** instead of keeping the last good list on screen. Holding it would mean caching it outside Apollo (a `keepPreviousData` pattern).
 - **No CI.** Tests must be run manually before pushing.
 - **Only the `name` filter is implemented** of the six the brief lists.
 - **Create and update are not optimistic.** They still wait for the server round-trip, and a task created while a search is active can briefly be missing from the unfiltered list until `cache-and-network` revalidates it. Delete is the only mutation with instant feedback.
