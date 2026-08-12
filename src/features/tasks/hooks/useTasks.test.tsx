@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client/react';
 import { MockLink } from '@apollo/client/testing';
 import { useTasks } from './useTasks';
+import { getLoggedErrors, clearLoggedErrors } from '../../../lib/error-logger';
 import { GET_TASKS } from '../graphql/queries';
 import type { ReactNode } from 'react';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
@@ -86,6 +87,22 @@ describe('useTasks', () => {
     expect(result.current.searchTerm).toBe('');
   });
 
+
+  it('reports a failed query to the error logger', async () => {
+    clearLoggedErrors();
+    const { result } = renderHook(() => useTasks(), {
+      wrapper: createWrapper([errorMock]),
+    });
+
+    await waitFor(() => {
+      expect(result.current.error).toBeDefined();
+    });
+
+    await waitFor(() => {
+      expect(getLoggedErrors()).toHaveLength(1);
+    });
+    expect(getLoggedErrors()[0].context).toEqual({ action: 'loadTasks' });
+  });
 
   it('returns an error when the query fails', async () => {
     const { result } = renderHook(() => useTasks(), {

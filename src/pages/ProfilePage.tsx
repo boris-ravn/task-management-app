@@ -4,28 +4,25 @@ import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user, loading, error } = useProfile();
+  const { user, loading, error, retry } = useProfile();
 
   if (loading) {
     return (
       <div className={styles.page}>
-        <p>Loading...</p>
+        <p className={styles.message}>Loading...</p>
       </div>
     );
   }
 
-  if (error) {
+  // A successful response with no profile leaves the page just as unusable as a
+  // failed one, so both take the same recoverable error state.
+  if (error || !user) {
     return (
       <div className={styles.page}>
-        <p>Error loading profile.</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className={styles.page}>
-        <p>Error loading profile.</p>
+        <p className={styles.message}>Error loading profile.</p>
+        <button className={styles.retryButton} onClick={retry}>
+          Try again
+        </button>
       </div>
     );
   }

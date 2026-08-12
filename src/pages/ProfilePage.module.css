@@ -14,6 +14,21 @@
   font: inherit;
 }
 
+.message {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0 0 var(--spacing-12);
+}
+
+.retryButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-link);
+  font-size: 0.875rem;
+  padding: 0;
+}
+
 .card {
   background: var(--color-bg-surface);
   border-radius: 12px;

@@ -18,18 +18,33 @@ const COLUMNS: { status: Status; label: string }[] = [
 ]
 
 function DashboardContent() {
-  const { tasks, loading, error, searchTerm } = useTasks()
+  const { tasks, loading, error, searchTerm, retry } = useTasks()
   const { state, dispatch } = useTasksUI()
 
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
   if (loading) {
-    return <>Loading...</>
+    return (
+      <div className={styles.page}>
+        <div className={styles.empty}>
+          <p className={styles.emptyLabel}>Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
-    return <>Error loading tasks.</>
+    return (
+      <div className={styles.page}>
+        <div className={styles.empty}>
+          <p className={styles.emptyLabel}>Error loading tasks.</p>
+          <button className={styles.retryButton} onClick={retry}>
+            Try again
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

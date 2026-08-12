@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/client/react';
+import { useLogQueryError } from '../../../hooks/useLogQueryError';
 import { GET_PROFILE } from '../graphql/queries';
 
 interface User {
@@ -13,6 +14,8 @@ interface UseProfileResult {
   user: User | undefined;
   loading: boolean;
   error: Error | undefined;
+  /** Re-runs the query, for a retry control on the error state. */
+  retry: () => void;
 }
 
 interface GetProfileData {
@@ -20,11 +23,17 @@ interface GetProfileData {
 }
 
 export function useProfile(): UseProfileResult {
-  const { data, loading, error } = useQuery<GetProfileData>(GET_PROFILE);
+  const { data, loading, error, refetch } = useQuery<GetProfileData>(GET_PROFILE);
+
+  useLogQueryError(error, 'loadProfile');
 
   return {
     user: data?.profile ?? undefined,
     loading,
     error,
+    retry: () => {
+      // A failed retry resurfaces through `error` and is reported by the hook above.
+      refetch().catch(() => {});
+    },
   };
 }

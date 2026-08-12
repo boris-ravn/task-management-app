@@ -9,7 +9,7 @@ import { Status, TaskTag, PointEstimate } from '../features/tasks/types';
 import type { Task } from '../features/tasks/types';
 
 vi.mock('../features/tasks/hooks/useTasks', () => ({
-  useTasks: vi.fn(() => ({ tasks: [], loading: true, error: undefined, searchTerm: '' })),
+  useTasks: vi.fn(() => ({ tasks: [], loading: true, error: undefined, searchTerm: '', retry: vi.fn() })),
 }));
 
 vi.mock('../features/tasks/hooks/useCreateTask', () => ({
@@ -45,6 +45,8 @@ vi.mock('../features/tasks/hooks/useDeleteTask', () => ({
   }),
 }));
 
+const mockRetry = vi.fn();
+
 const MOCK_TASK = {
   id: '1',
   name: 'Test Task',
@@ -66,13 +68,22 @@ describe('DashboardPage', () => {
   });
 
   it('renders an error message when tasks fail to load', () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: new Error('fail'), searchTerm: '' });
+    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: new Error('fail'), searchTerm: '', retry: mockRetry });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     expect(screen.getByText(/error/i)).toBeInTheDocument();
   });
 
+  it('offers a retry that re-runs the query when tasks fail to load', async () => {
+    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: new Error('fail'), searchTerm: '', retry: mockRetry });
+    render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(mockRetry).toHaveBeenCalledTimes(1);
+  });
+
   it('renders all five column labels', () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [MOCK_TASK], loading: false, error: undefined, searchTerm: '' });
+    vi.mocked(useTasks).mockReturnValue({ tasks: [MOCK_TASK], loading: false, error: undefined, searchTerm: '', retry: vi.fn() });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     expect(screen.getByText(/backlog/i)).toBeInTheDocument();
     expect(screen.getByText(/to do/i)).toBeInTheDocument();
@@ -82,7 +93,7 @@ describe('DashboardPage', () => {
   });
 
   it('shows a no-tasks-yet empty state when there are no tasks and no search', () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: '' });
+    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: '', retry: vi.fn() });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
 
     expect(screen.getByText('No tasks yet')).toBeInTheDocument();
@@ -90,21 +101,21 @@ describe('DashboardPage', () => {
   });
 
   it('names the search term in the empty state when a search returns nothing', () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: 'zzz' });
+    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: 'zzz', retry: vi.fn() });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
 
     expect(screen.getByText('No tasks match "zzz"')).toBeInTheDocument();
   });
 
   it('keeps the add-task button reachable while the board is empty', () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: '' });
+    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: '', retry: vi.fn() });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
 
     expect(screen.getAllByRole('button', { name: /add task/i }).length).toBeGreaterThan(0);
   });
 
   it('clicking the + button opens the task modal', async () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: '' });
+    vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: undefined, searchTerm: '', retry: vi.fn() });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
     const addButton = screen.getAllByRole('button', { name: /add task/i })[0];
     await userEvent.click(addButton);
