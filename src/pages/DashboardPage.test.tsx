@@ -67,8 +67,6 @@ describe('DashboardPage', () => {
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
-  // cache-and-network reports loading during every background revalidation, so a
-  // loading-only guard would blank the board on each debounced keystroke.
   it('keeps the board rendered while revalidating with tasks already loaded', () => {
     vi.mocked(useTasks).mockReturnValue({ tasks: [MOCK_TASK], loading: true, error: undefined, searchTerm: '', retry: vi.fn() });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);

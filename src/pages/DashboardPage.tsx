@@ -24,9 +24,8 @@ function DashboardContent() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
-  // Both guards require an empty list: with cache-and-network, `loading` and
-  // `error` also occur during background revalidation, when there is still
-  // perfectly good data on screen that must not be replaced.
+  // The length checks are load-bearing: under cache-and-network both `loading` and
+  // `error` also occur during background revalidation, with good data on screen.
   if (loading && tasks.length === 0) {
     return (
       <div className={styles.page}>

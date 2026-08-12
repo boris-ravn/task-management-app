@@ -15,11 +15,10 @@ export function useDeleteTask() {
             // selection set, so without it this write is never normalized and the
             // eviction below finds nothing to remove.
             optimisticResponse: { deleteTask: { __typename: 'Task', id } },
-            // Evicting the entity is enough. The cache keeps one task list per
-            // filter, and every one of them drops an unreadable reference on read,
-            // so a single eviction updates them all — no per-list logic, and no
-            // refetch. Runs twice (optimistic layer, then real result), which is
-            // safe because evict is idempotent.
+            // Runs twice — optimistic layer, then real result — so it has to be
+            // idempotent. Splicing the lists by hand would double-apply; evicting
+            // the entity is both idempotent and enough, since every cached list
+            // drops an unreadable reference on read.
             update: (cache) => {
                 cache.evict({ id: cache.identify({ __typename: 'Task', id }) });
             },

@@ -27,8 +27,6 @@ function task(id: string, name: string) {
 const UNFILTERED_INPUT = { input: {} };
 const FILTERED_INPUT = { input: { name: 'Ticket' } };
 
-// Two cached lists over the same entities — the shape the real app ends up in as
-// soon as the user types in the search box.
 const unfilteredListMock: MockLink.MockedResponse = {
   request: { query: GET_TASKS, variables: UNFILTERED_INPUT },
   result: { data: { tasks: [task(DOOMED_ID, 'Ticket doomed'), task(SURVIVOR_ID, 'Ticket survivor')] } },
@@ -99,8 +97,6 @@ describe('useDeleteTask', () => {
       await result.current.deleteTask(DOOMED_ID);
     });
 
-    // The hook never touched either list directly — it evicted the entity, and
-    // both lists dropped the now-unreadable reference on read.
     expect(cachedIds(client, UNFILTERED_INPUT)).toEqual([SURVIVOR_ID]);
     expect(cachedIds(client, FILTERED_INPUT)).toEqual([]);
   });
@@ -132,7 +128,6 @@ describe('useDeleteTask', () => {
       await expect(result.current.deleteTask(DOOMED_ID)).rejects.toThrow('Network error');
     });
 
-    // Apollo discards the optimistic layer on error, so the eviction is undone.
     expect(cachedIds(client, UNFILTERED_INPUT)).toEqual([DOOMED_ID, SURVIVOR_ID]);
     expect(cache.extract()[`Task:${DOOMED_ID}`]).toBeDefined();
   });
