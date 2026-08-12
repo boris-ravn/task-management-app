@@ -179,9 +179,40 @@ GraphQL enums are mirrored in `src/features/tasks/types.ts` as TypeScript `const
 
 The search term is stored in the URL as `?q=` rather than in component state. This gives back/forward navigation and allows sharing a filtered view via URL. `useTasks` reads `?q=` with `useSearchParams`, passes it through a 300 ms `useDebounce`, and sends it as `FilterTaskInput.name` to GraphQL. The Header writes to the URL independently, so the hook and the input are decoupled.
 
-### `refetchQueries` for mutation consistency
+### Cache strategy: eviction for delete, refetch for create and update
 
-All three mutations (create, update, delete) call `refetchQueries: [GET_TASKS]` on completion. This re-fetches the task list from the server and ensures the board always reflects authoritative server state, rather than relying on manual cache updates that could diverge.
+`InMemoryCache` stores **one task list per filter**. Typing two search terms leaves three separate lists in `ROOT_QUERY`, all pointing at the same normalized `Task:<id>` entities:
+
+```
+tasks({"input":{}})                  → 9 refs
+tasks({"input":{"name":"Ticket1"}})  → 1 ref
+tasks({"input":{"name":"Ticket"}})   → 8 refs
+```
+
+That structure decides the strategy, because the three mutations are not equivalent:
+
+**Update needs no cache work at all.** `UPDATE_TASK` returns the full task, so normalization writes the entity once and every cached list sees the new field values immediately. Only changes to list *membership* are a problem.
+
+**Delete evicts the entity** (`useDeleteTask.ts`). One call removes it from every cached list at once, because Apollo filters unreadable references out of array results on read. No per-list logic, and no refetch:
+
+```ts
+update: (cache) => {
+  cache.evict({ id: cache.identify({ __typename: 'Task', id }) });
+}
+```
+
+Paired with an `optimisticResponse`, the card disappears in well under 100 ms — verified — and Apollo rolls the eviction back automatically if the mutation fails, so the card reappears alongside the error toast.
+
+Two non-obvious details this relies on:
+
+- **`__typename: 'Task'` is mandatory in the optimistic response.** `DELETE_TASK` selects only `id`; Apollo injects `__typename` into the *server's* selection set, but a hand-written optimistic object gets no such treatment, and without it the write is never normalized and the eviction silently matches nothing.
+- **No `cache.gc()`.** The familiar docs snippet pairs `evict` with `gc`, but `gc()` always deletes from the root cache layer (`while (root instanceof Layer) root = root.parent`), so calling it during the optimistic pass makes deletions that a rollback cannot undo. It is only safe *after* the mutation settles. Skipping it can leave an orphaned `User` entity, which is a bounded memory nicety, not a correctness issue.
+
+**Create and update keep `refetchQueries: [GET_TASKS]`.** Inserting into a *filtered* list would mean reimplementing the server's filter predicate on the client — deciding whether a new task matches `{"name":"Ticket"}` — which is exactly the kind of client/server divergence manual cache writes are criticised for.
+
+**The list query revalidates.** `refetchQueries` only refreshes queries with an active observer, so a create during an active search left other cached lists stale, and the default `cache-first` policy served them indefinitely. `useTasks` therefore sets `fetchPolicy: 'cache-and-network'`: cached data paints instantly, then the query revalidates. Preferred over `refetchQueries: 'all'`, which would re-fetch every cached query — including `profile` and every accumulated search variant — growing without bound as the user types.
+
+This is why `DashboardPage` guards on `loading && tasks.length === 0` rather than `loading` alone. Under `cache-and-network`, `loading` is also true during background revalidation, when there is good data on screen that must not be replaced by a placeholder.
 
 ---
 
@@ -219,3 +250,4 @@ Scoped out deliberately, listed so they are not mistaken for oversights:
 - **No error boundary.** A render-time throw still blanks the app; only async mutation failures are handled.
 - **No CI.** Tests must be run manually before pushing.
 - **Only the `name` filter is implemented** of the six the brief lists.
+- **Create and update are not optimistic.** They still wait for the server round-trip, and a task created while a search is active can briefly be missing from the unfiltered list until `cache-and-network` revalidates it. Delete is the only mutation with instant feedback.
