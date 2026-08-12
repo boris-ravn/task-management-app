@@ -214,6 +214,8 @@ Two non-obvious details this relies on:
 
 This is why `DashboardPage` guards on `loading && tasks.length === 0` rather than `loading` alone. Under `cache-and-network`, `loading` is also true during background revalidation, when there is good data on screen that must not be replaced by a placeholder.
 
+The `error` branch needs no equivalent check. With the default `errorPolicy`, an errored query reports no data at all — measured as `dataState: 'empty'` even when the cache holds the list, and `errorPolicy: 'all'` does not change this for *network* failures. So `error` and an empty list always coincide: a failed revalidation blanks the board and shows the error with a retry, rather than going quietly stale. Preserving the last good list through a failed refetch would mean holding it outside Apollo, which is not currently done.
+
 ---
 
 ## Schema / Design Mismatches

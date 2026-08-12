@@ -24,8 +24,9 @@ function DashboardContent() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
-  // The length checks are load-bearing: under cache-and-network both `loading` and
-  // `error` also occur during background revalidation, with good data on screen.
+  // The length check is load-bearing: under cache-and-network `loading` is also true
+  // during background revalidation, with good data on screen that must not be
+  // replaced. `error` needs no such check — Apollo drops the data on error.
   if (loading && tasks.length === 0) {
     return (
       <div className={styles.page}>
@@ -36,7 +37,7 @@ function DashboardContent() {
     )
   }
 
-  if (error && tasks.length === 0) {
+  if (error) {
     return (
       <div className={styles.page}>
         <div className={styles.empty}>

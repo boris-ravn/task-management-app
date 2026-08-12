@@ -76,14 +76,6 @@ describe('DashboardPage', () => {
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 
-  it('keeps the board rendered when a revalidation fails with tasks already loaded', () => {
-    vi.mocked(useTasks).mockReturnValue({ tasks: [MOCK_TASK], loading: false, error: new Error('fail'), searchTerm: '', retry: mockRetry });
-    render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
-
-    expect(screen.getByText(MOCK_TASK.name)).toBeInTheDocument();
-    expect(screen.queryByText('Error loading tasks.')).not.toBeInTheDocument();
-  });
-
   it('renders an error message when tasks fail to load', () => {
     vi.mocked(useTasks).mockReturnValue({ tasks: [], loading: false, error: new Error('fail'), searchTerm: '', retry: mockRetry });
     render(<MemoryRouter><ToastProvider><DashboardPage /></ToastProvider></MemoryRouter>);
